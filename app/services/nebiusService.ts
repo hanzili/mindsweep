@@ -3,6 +3,8 @@ import { ClarifiedResult } from "~/components/ResultsScreen";
 // Nebius Studio API settings
 const NEBIUS_STUDIO_API_URL = "https://api.studio.nebius.com/v1/chat/completions";
 const NEBIUS_API_KEY = process.env.NEBIUS_API_KEY || "";
+// Default timeout of 60 seconds (increased from 15)
+const DEFAULT_TIMEOUT_MS = 60000;
 
 interface NebiusStudioResponse {
   success: boolean;
@@ -15,75 +17,102 @@ interface NebiusStudioResponse {
  * 
  * @param input The user's raw brain dump text input
  * @param apiKey Nebius Studio API key (defaults to the configured key)
+ * @param timeoutMs Timeout in milliseconds for the API request (defaults to 60 seconds)
  * @returns Processed GTD categorization
  */
-export async function processWithNebiusStudio(input: string, apiKey: string = NEBIUS_API_KEY): Promise<NebiusStudioResponse> {
+export async function processWithNebiusStudio(
+  input: string, 
+  apiKey: string = NEBIUS_API_KEY,
+  timeoutMs: number = DEFAULT_TIMEOUT_MS
+): Promise<NebiusStudioResponse> {
   try {
     const prompt = generatePrompt(input);
     
     console.log("Making request to Nebius API at:", NEBIUS_STUDIO_API_URL);
+    console.log(`Using timeout of ${timeoutMs}ms for Nebius API request`);
     
-    const response = await fetch(NEBIUS_STUDIO_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "deepseek-ai/DeepSeek-R1-fast",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.2,
-        max_tokens: 8192
-      })
-    });
-
-    // Log the response status
-    console.log("Nebius API response status:", response.status, response.statusText);
+    // Create an AbortController for timeout handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     
-    const responseText = await response.text();
-    console.log("Nebius API response body:", responseText.substring(0, 500) + "...");
-    
-    if (!response.ok) {
-      try {
-        const errorData = JSON.parse(responseText);
-        throw new Error(errorData.error?.message || `Failed to process with Nebius Studio: ${response.status} ${response.statusText}`);
-      } catch (parseError) {
-        throw new Error(`Failed to process with Nebius Studio: ${response.status} ${response.statusText}. Response: ${responseText.substring(0, 200)}...`);
-      }
-    }
-
-    // Parse the response text to JSON
-    let data;
     try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error("Error parsing Nebius API response:", parseError);
-      throw new Error(`Invalid JSON response from Nebius API: ${responseText.substring(0, 200)}...`);
+      const response = await fetch(NEBIUS_STUDIO_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "deepseek-ai/DeepSeek-R1-fast",
+          messages: [
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          temperature: 0.2,
+          max_tokens: 8192
+        }),
+        signal: controller.signal
+      });
+
+      // Clear the timeout since the request completed
+      clearTimeout(timeoutId);
+
+      // Log the response status
+      console.log("Nebius API response status:", response.status, response.statusText);
+      
+      const responseText = await response.text();
+      console.log("Nebius API response body:", responseText.substring(0, 500) + "...");
+      
+      if (!response.ok) {
+        try {
+          const errorData = JSON.parse(responseText);
+          throw new Error(errorData.error?.message || `Failed to process with Nebius Studio: ${response.status} ${response.statusText}`);
+        } catch (parseError) {
+          throw new Error(`Failed to process with Nebius Studio: ${response.status} ${response.statusText}. Response: ${responseText.substring(0, 200)}...`);
+        }
+      }
+
+      // Parse the response text to JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Error parsing Nebius API response:", parseError);
+        throw new Error(`Invalid JSON response from Nebius API: ${responseText.substring(0, 200)}...`);
+      }
+      
+      console.log("Parsed Nebius API response:", JSON.stringify(data, null, 2).substring(0, 500) + "...");
+      
+      // Extract the response content based on the OpenAI format
+      let jsonResponseText;
+      
+      if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+        jsonResponseText = data.choices[0].message.content;
+      } else {
+        console.error("Unexpected Nebius API response structure:", data);
+        throw new Error("Unexpected response structure from Nebius API");
+      }
+      
+      const result = extractJsonFromText(jsonResponseText);
+      
+      return { 
+        success: true, 
+        result: result as ClarifiedResult
+      };
+    } catch (fetchError: unknown) {
+      // Clear the timeout to prevent memory leaks
+      clearTimeout(timeoutId);
+      
+      // Check if this was a timeout error
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        throw new Error(`Nebius API request timed out after ${timeoutMs / 1000} seconds`);
+      }
+      
+      // Re-throw other errors
+      throw fetchError;
     }
-    
-    console.log("Parsed Nebius API response:", JSON.stringify(data, null, 2).substring(0, 500) + "...");
-    
-    // Extract the response content based on the OpenAI format
-    let jsonResponseText;
-    
-    if (data.choices && data.choices.length > 0 && data.choices[0].message) {
-      jsonResponseText = data.choices[0].message.content;
-    } else {
-      console.error("Unexpected Nebius API response structure:", data);
-      throw new Error("Unexpected response structure from Nebius API");
-    }
-    
-    const result = extractJsonFromText(jsonResponseText);
-    
-    return { 
-      success: true, 
-      result: result as ClarifiedResult
-    };
   } catch (error) {
     console.error("Error processing with Nebius Studio:", error);
     return {
