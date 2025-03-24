@@ -4,9 +4,37 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-gray-900;
+  font-family: 'Inter', sans-serif;
+  color-scheme: dark;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+/* Custom Classes */
+.glass {
+  @apply backdrop-blur-md border border-white border-opacity-10 rounded-xl;
+  background-color: rgba(30, 30, 38, 0.65);
+}
+
+.glass-nav {
+  @apply backdrop-blur-md border-b border-white border-opacity-5;
+  background-color: rgba(18, 18, 24, 0.8);
+}
+
+.btn-primary {
+  @apply transition-all duration-300;
+  background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%);
+}
+
+.btn-primary:hover {
+  @apply opacity-90 -translate-y-0.5 shadow-lg;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

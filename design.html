@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindSweep.AI - GTD Clarify Companion</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .glass {
+      background: rgba(30, 30, 38, 0.65);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+    }
+    
+    .glass-nav {
+      background: rgba(18, 18, 24, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .page-mockup {
+      width: 100%;
+      height: 100vh;
+      margin: 0;
+      position: relative;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+    
+    .bg-texture {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2069&auto=format&fit=crop');
+      background-size: cover;
+      opacity: 0.1;
+      z-index: -1;
+    }
+    
+    .no-scrollbar {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+    
+    .page-title {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      background: #252530;
+      padding: 5px 15px;
+      border-radius: 6px;
+      font-weight: bold;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body class="bg-gray-900">
+  <div class="w-full">
+    <h1 class="text-3xl font-bold text-center text-white mb-8">MindSweep.AI - GTD Clarify Companion</h1>
+    
+    <!-- Page 1: Brain Dump Input -->
+    <div class="page-mockup">
+      <div class="page-title">Page 1: Brain Dump Input</div>
+      <div class="bg-texture"></div>
+      
+      <!-- Top Navigation -->
+      <div class="glass-nav w-full h-16 px-6 flex items-center justify-between">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          <span class="text-xl font-bold ml-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">MindSweep.AI</span>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            New Session
+          </button>
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+            History
+          </button>
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Settings
+          </button>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="w-full h-full p-6 flex flex-col" style="height: calc(100% - 64px);">
+        <!-- Instructions -->
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-bold text-indigo-300 mb-2">Brain Dump</h2>
+          <p class="text-gray-400">Type or paste your thoughts below. Don't worry about structure—just let it flow.</p>
+        </div>
+        
+        <!-- Input Area -->
+        <div class="glass flex-1 p-4 mb-6 relative">
+          <textarea placeholder="• Tasks I need to do...
+• Projects I'm thinking about...
+• Feelings I'm having...
+• Ideas to explore...
+• Things to remember..." class="w-full h-full bg-transparent focus:outline-none text-white resize-none no-scrollbar"></textarea>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex justify-center space-x-4">
+          <button class="glass px-4 py-2 rounded-lg text-gray-300 hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Clear
+          </button>
+          <button class="glass px-4 py-2 rounded-lg text-gray-300 hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+            </svg>
+            Templates
+          </button>
+          <button class="btn-primary px-6 py-3 rounded-lg text-white font-bold shadow-lg hover:shadow-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Clarify Now
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Page 2: Results Screen -->
+    <div class="page-mockup">
+      <div class="page-title">Page 2: Results Screen</div>
+      <div class="bg-texture"></div>
+      
+      <!-- Top Navigation -->
+      <div class="glass-nav w-full h-16 px-6 flex items-center justify-between">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          <span class="text-xl font-bold ml-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">MindSweep.AI</span>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Re-process
+          </button>
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            Export
+          </button>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="w-full h-[calc(100%-64px)] p-6 flex flex-col">
+        <div class="text-center mb-4">
+          <h2 class="text-2xl font-bold text-indigo-300">Clarified Results</h2>
+          <p class="text-gray-400">Your thoughts have been organized into GTD categories.</p>
+        </div>
+        
+        <!-- Results Grid -->
+        <div class="grid grid-cols-2 gap-4 h-[calc(100%-70px)] overflow-hidden">
+          <!-- Next Actions -->
+          <div class="glass p-4 flex flex-col">
+            <div class="flex items-center mb-3">
+              <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-green-400">Next Actions</h3>
+            </div>
+            <div class="flex-grow overflow-auto no-scrollbar pr-2">
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Schedule a time to meet Sean in person and prepare discussion topics</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Check your last vaccine record and book your vaccination appointment</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Wait for the rental renewal email</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Check Virgin Plus subscription status</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Add all your classes and office hours to your calendar</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Projects -->
+          <div class="glass p-4 flex flex-col">
+            <div class="flex items-center mb-3">
+              <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-blue-400">Projects</h3>
+            </div>
+            <div class="flex-grow overflow-auto no-scrollbar pr-2">
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Develop a niche GTD tool concept for Nebius submission</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Create or adopt an automated solution for rent payment</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Maintain and enhance relationships with friends, family, and your entrepreneurial network</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Someday/Maybe -->
+          <div class="glass p-4 flex flex-col">
+            <div class="flex items-center mb-3">
+              <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-bold text-purple-400">Someday/Maybe</h3>
+            </div>
+            <div class="flex-grow overflow-auto no-scrollbar pr-2">
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Break out of your comfort zone with new activities</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Consider additional strategies for reducing phone time and doom scrolling</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-5 h-5 mt-0.5 mr-2 rounded border border-gray-500"></span>
+                  <span>Further develop the idea of making drinks at home balancing cost, quality, and control</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Reflections/Open Questions/Reference -->
+          <div class="glass p-4 flex flex-col">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center mb-3">
+                <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-bold text-amber-400">Other Items</h3>
+              </div>
+              <div class="flex space-x-2">
+                <button class="text-xs bg-amber-900 bg-opacity-30 text-amber-400 px-2 py-1 rounded">Reflections</button>
+                <button class="text-xs bg-gray-700 bg-opacity-30 text-gray-400 px-2 py-1 rounded">Questions</button>
+                <button class="text-xs bg-gray-700 bg-opacity-30 text-gray-400 px-2 py-1 rounded">Reference</button>
+              </div>
+            </div>
+            <div class="flex-grow overflow-auto no-scrollbar pr-2">
+              <ul class="space-y-2">
+                <li class="flex items-start">
+                  <span class="inline-block w-2 h-2 mt-2 mr-2 rounded-full bg-amber-400"></span>
+                  <span>Feeling like a loser for not making money this semester despite achieving meaningful things</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-2 h-2 mt-2 mr-2 rounded-full bg-amber-400"></span>
+                  <span>Realizing that 1/3 of the year has passed and time is fleeting</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-2 h-2 mt-2 mr-2 rounded-full bg-amber-400"></span>
+                  <span>Frustration over expensive drinks and the challenge of controlling spending</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="inline-block w-2 h-2 mt-2 mr-2 rounded-full bg-amber-400"></span>
+                  <span>Concerns about academic performance and personal growth</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Page 3: Export Options -->
+    <div class="page-mockup">
+      <div class="page-title">Page 3: Export Options</div>
+      <div class="bg-texture"></div>
+      
+      <!-- Top Navigation -->
+      <div class="glass-nav w-full h-16 px-6 flex items-center justify-between">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          <span class="text-xl font-bold ml-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">MindSweep.AI</span>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            New Session
+          </button>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="w-full h-[calc(100%-64px)] p-6 flex flex-col">
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-bold text-indigo-300">Export Options</h2>
+          <p class="text-gray-400">Choose how you want to save or share your clarified thoughts.</p>
+        </div>
+        
+        <div class="flex justify-center space-x-6 mb-8">
+          <div class="flex space-x-2">
+            <label class="inline-flex items-center">
+              <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded" checked>
+              <span class="ml-2 text-gray-300">Next Actions</span>
+            </label>
+          </div>
+          <div class="flex space-x-2">
+            <label class="inline-flex items-center">
+              <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded" checked>
+              <span class="ml-2 text-gray-300">Projects</span>
+            </label>
+          </div>
+          <div class="flex space-x-2">
+            <label class="inline-flex items-center">
+              <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded" checked>
+              <span class="ml-2 text-gray-300">Someday/Maybe</span>
+            </label>
+          </div>
+          <div class="flex space-x-2">
+            <label class="inline-flex items-center">
+              <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded">
+              <span class="ml-2 text-gray-300">Reflections</span>
+            </label>
+          </div>
+          <div class="flex space-x-2">
+            <label class="inline-flex items-center">
+              <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded">
+              <span class="ml-2 text-gray-300">Questions</span>
+            </label>
+          </div>
+          <div class="flex space-x-2">
+            <label class="inline-flex items-center">
+              <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-500 rounded">
+              <span class="ml-2 text-gray-300">References</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Export Grid -->
+        <div class="grid grid-cols-2 gap-y-6 gap-x-8">
+          <!-- Notion -->
+          <div class="glass p-6 flex items-center cursor-pointer hover:bg-opacity-80 transition-all">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png" alt="Notion" class="w-12 h-12 mr-4">
+            <div>
+              <h3 class="text-xl font-semibold text-white">Export to Notion</h3>
+              <p class="text-gray-400 text-sm">Send directly to your Notion workspace as formatted blocks</p>
+            </div>
+          </div>
+          
+          <!-- Markdown -->
+          <div class="glass p-6 flex items-center cursor-pointer hover:bg-opacity-80 transition-all">
+            <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white">Export as Markdown</h3>
+              <p class="text-gray-400 text-sm">Download a Markdown file with all your clarified thoughts</p>
+            </div>
+          </div>
+          
+          <!-- Clipboard -->
+          <div class="glass p-6 flex items-center cursor-pointer hover:bg-opacity-80 transition-all">
+            <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white">Copy to Clipboard</h3>
+              <p class="text-gray-400 text-sm">Copy the formatted text to paste anywhere you want</p>
+            </div>
+          </div>
+          
+          <!-- JSON -->
+          <div class="glass p-6 flex items-center cursor-pointer hover:bg-opacity-80 transition-all">
+            <div class="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white">Export as JSON</h3>
+              <p class="text-gray-400 text-sm">Download a JSON file for use in other apps</p>
+            </div>
+          </div>
+          
+          <!-- Todoist -->
+          <div class="glass p-6 flex items-center cursor-pointer opacity-70 hover:opacity-100 transition-all">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6d/Todoist_logo.png" alt="Todoist" class="w-12 h-12 mr-4">
+            <div>
+              <h3 class="text-xl font-semibold text-white">Export to Todoist</h3>
+              <p class="text-gray-400 text-sm">Coming soon - Send tasks directly to your Todoist account</p>
+            </div>
+          </div>
+          
+          <!-- Email -->
+          <div class="glass p-6 flex items-center cursor-pointer opacity-70 hover:opacity-100 transition-all">
+            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-white">Email to Yourself</h3>
+              <p class="text-gray-400 text-sm">Coming soon - Send a copy to your email inbox</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Page 4: History View -->
+    <div class="page-mockup">
+      <div class="page-title">Page 4: History View</div>
+      <div class="bg-texture"></div>
+      
+      <!-- Top Navigation -->
+      <div class="glass-nav w-full h-16 px-6 flex items-center justify-between">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          <span class="text-xl font-bold ml-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">MindSweep.AI</span>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+          <button class="glass px-3 py-2 rounded-lg flex items-center text-sm hover:bg-opacity-80">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            New Session
+          </button>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="w-full h-[calc(100%-64px)] p-6 flex flex-col">
+        <div class="text-center mb-6">
+          <h2 class="text-2xl font-bold text-indigo-300">Session History</h2>
+          <p class="text-gray-400">Review and revisit your previous clarification sessions.</p>
+        </div>
+        
+        <!-- Search & Filter -->
+        <div class="flex items-center justify-between mb-6">
+          <div class="glass flex items-center px-4 py-2 rounded-lg w-1/3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" placeholder="Search sessions..." class="bg-transparent focus:outline-none text-white w-full">
+          </div>
+          
+          <div class="flex space-x-2">
+            <button class="glass px-3 py-2 rounded-lg text-sm hover:bg-opacity-80">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filter
+            </button>
+            <button class="glass px-3 py-2 rounded-lg text-sm hover:bg-opacity-80">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+              </svg>
+              Sort
+            </button>
+          </div>
+        </div>
+        
+        <!-- Sessions List -->
+        <div class="flex-grow glass rounded-lg overflow-hidden">
+          <div class="p-4 h-full overflow-auto no-scrollbar">
+            <!-- Session Item -->
+            <div class="glass mb-4 p-4 rounded-lg hover:bg-opacity-80 cursor-pointer transition-all border border-indigo-500 border-opacity-30">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-semibold text-white">Today's Priorities</h3>
+                <span class="text-xs text-gray-400">Today, 2:45 PM</span>
+              </div>
+              <div class="text-gray-400 text-sm mb-2 line-clamp-2">
+                I need to schedule a time to meet Sean in person and prepare discussion topics. Also need to check my vaccine record and book an appointment...
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-green-900 bg-opacity-30 text-green-400 px-2 py-1 rounded">5 Actions</span>
+                <span class="text-xs bg-blue-900 bg-opacity-30 text-blue-400 px-2 py-1 rounded">3 Projects</span>
+                <span class="text-xs bg-purple-900 bg-opacity-30 text-purple-400 px-2 py-1 rounded">2 Someday</span>
+              </div>
+            </div>
+            
+            <!-- Session Item -->
+            <div class="glass mb-4 p-4 rounded-lg hover:bg-opacity-80 cursor-pointer transition-all">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-semibold text-white">Academic Planning</h3>
+                <span class="text-xs text-gray-400">Yesterday, 10:12 AM</span>
+              </div>
+              <div class="text-gray-400 text-sm mb-2 line-clamp-2">
+                Need to explore having a fixed schedule for school. Try to make progress on COMP461 myself. Need to plan out the work and send a message...
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-green-900 bg-opacity-30 text-green-400 px-2 py-1 rounded">8 Actions</span>
+                <span class="text-xs bg-blue-900 bg-opacity-30 text-blue-400 px-2 py-1 rounded">2 Projects</span>
+                <span class="text-xs bg-amber-900 bg-opacity-30 text-amber-400 px-2 py-1 rounded">4 Reflections</span>
+              </div>
+            </div>
+            
+            <!-- Session Item -->
+            <div class="glass mb-4 p-4 rounded-lg hover:bg-opacity-80 cursor-pointer transition-all">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-semibold text-white">Business Ideas</h3>
+                <span class="text-xs text-gray-400">Apr 28, 2023</span>
+              </div>
+              <div class="text-gray-400 text-sm mb-2 line-clamp-2">
+                I want to start a business that makes progress. Through research I find it hard to make an all-in-one GTD tool. Some niche tool that follows GTD practice...
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-green-900 bg-opacity-30 text-green-400 px-2 py-1 rounded">4 Actions</span>
+                <span class="text-xs bg-blue-900 bg-opacity-30 text-blue-400 px-2 py-1 rounded">5 Projects</span>
+                <span class="text-xs bg-gray-700 bg-opacity-30 text-gray-400 px-2 py-1 rounded">3 Questions</span>
+              </div>
+            </div>
+            
+            <!-- Session Item -->
+            <div class="glass mb-4 p-4 rounded-lg hover:bg-opacity-80 cursor-pointer transition-all">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-semibold text-white">Personal Development</h3>
+                <span class="text-xs text-gray-400">Apr 25, 2023</span>
+              </div>
+              <div class="text-gray-400 text-sm mb-2 line-clamp-2">
+                I need to keep myself lean and healthy, I'm gaining face fat. Need to exercise every day. I want to read more books and contact my grandma frequently...
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-green-900 bg-opacity-30 text-green-400 px-2 py-1 rounded">6 Actions</span>
+                <span class="text-xs bg-purple-900 bg-opacity-30 text-purple-400 px-2 py-1 rounded">4 Someday</span>
+                <span class="text-xs bg-amber-900 bg-opacity-30 text-amber-400 px-2 py-1 rounded">5 Reflections</span>
+              </div>
+            </div>
+            
+            <!-- Session Item -->
+            <div class="glass mb-4 p-4 rounded-lg hover:bg-opacity-80 cursor-pointer transition-all">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-semibold text-white">Social Connections</h3>
+                <span class="text-xs text-gray-400">Apr 20, 2023</span>
+              </div>
+              <div class="text-gray-400 text-sm mb-2 line-clamp-2">
+                I need more social connections. I want to connect with Montreal entrepreneurs and make international friends. Keep contact with Santosh and Antony...
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs bg-green-900 bg-opacity-30 text-green-400 px-2 py-1 rounded">7 Actions</span>
+                <span class="text-xs bg-blue-900 bg-opacity-30 text-blue-400 px-2 py-1 rounded">2 Projects</span>
+                <span class="text-xs bg-gray-700 bg-opacity-30 text-gray-400 px-2 py-1 rounded">3 References</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

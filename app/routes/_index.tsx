@@ -1,54 +1,88 @@
+import { useState } from "react";
 import type { MetaFunction } from "@remix-run/node";
+import Navbar from "~/components/Navbar";
+import BrainDumpInput from "~/components/BrainDumpInput";
+import ResultsScreen, { ClarifiedResult } from "~/components/ResultsScreen";
+import { processInput } from "~/services/promptService";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "MindSweep.AI - GTD Clarify Companion" },
+    { name: "description", content: "Transform your messy thoughts into organized GTD elements" },
   ];
 };
 
+// Define application states
+type AppState = "INPUT" | "RESULTS";
+
 export default function Index() {
+  const [appState, setAppState] = useState<AppState>("INPUT");
+  const [results, setResults] = useState<ClarifiedResult>({
+    next_actions: [],
+    projects: [],
+    someday_maybe: [],
+    reflections: [],
+    questions: [],
+    references: []
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleClarify = async (input: string) => {
+    setIsProcessing(true);
+    setError(null);
+    
+    try {
+      const processedResults = await processInput(input);
+      setResults(processedResults);
+      setAppState("RESULTS");
+    } catch (err) {
+      setError("There was an error processing your input. Please try again.");
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  const handleNewSession = () => {
+    setAppState("INPUT");
+  };
+
   return (
-    <div className="flex h-screen items-center justify-center">
-      <div className="flex flex-col items-center gap-16">
-        <header className="flex flex-col items-center gap-9">
-          <h1 className="leading text-2xl font-bold text-gray-800 dark:text-gray-100">
-            Welcome to <span className="sr-only">Remix</span>
-          </h1>
-          <div className="h-[144px] w-[434px]">
-            <img
-              src="/logo-light.png"
-              alt="Remix"
-              className="block w-full dark:hidden"
-            />
-            <img
-              src="/logo-dark.png"
-              alt="Remix"
-              className="hidden w-full dark:block"
-            />
-          </div>
-        </header>
-        <nav className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-gray-200 p-6 dark:border-gray-700">
-          <p className="leading-6 text-gray-700 dark:text-gray-200">
-            What&apos;s next?
-          </p>
-          <ul>
-            {resources.map(({ href, text, icon }) => (
-              <li key={href}>
-                <a
-                  className="group flex items-center gap-3 self-stretch p-3 leading-normal text-blue-700 hover:underline dark:text-blue-500"
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {icon}
-                  {text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
+    <div className="min-h-screen">
+      <div className="bg-texture"></div>
+      
+      {/* Navbar with different options based on app state */}
+      {appState === "INPUT" && (
+        <Navbar 
+          showNewSession={false}
+          showHistory={true}
+        />
+      )}
+
+      {appState === "RESULTS" && (
+        <Navbar 
+          showNewSession={true}
+          showHistory={false}
+          onNewSession={handleNewSession}
+        />
+      )}
+
+      {/* Main Content based on app state */}
+      {appState === "INPUT" && (
+        <BrainDumpInput onClarify={handleClarify} />
+      )}
+
+      {appState === "RESULTS" && (
+        <ResultsScreen results={results} />
+      )}
+
+      {/* Error message */}
+      {error && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-6 py-3 rounded-lg shadow-lg">
+          {error}
+        </div>
+      )}
     </div>
   );
 }

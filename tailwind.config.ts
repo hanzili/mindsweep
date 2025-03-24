@@ -16,6 +16,10 @@ export default {
           "Noto Color Emoji",
         ],
       },
+      opacity: {
+        '8': '0.08',
+        '65': '0.65',
+      },
     },
   },
   plugins: [],
